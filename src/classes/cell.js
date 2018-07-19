@@ -1,19 +1,14 @@
-let app, cookieData;
-let bounds = { width: window.innerWidth, height: window.innerHeight };;
-const cells = [];
-const palette = [0x069CF6, 0xFC5F02, 0xF1C917, 0x20E045, 0xF82D04, 0x63419D];
-
 class Cell {
-  constructor(domain, cookies) {
+  constructor(app, domain, cookies, size) {
     this.domain = domain;
     this.cookies = cookies;
-    this.size = 10 + cookies.length * window.innerWidth / cookieData.total;
+    this.size = size;
     this.color = _.sample(palette);
     this.xSpeed = (-0.5 + Math.random()) * 0.5;
     this.ySpeed = (-0.5 + Math.random()) * 0.5;
-    this.render();
-    this.ctnr.x = this.size + Math.random() * (bounds.width - this.size);
-    this.ctnr.y = this.size + Math.random() * (bounds.height - this.size);
+    this.render(app);
+    this.ctnr.x = this.size + Math.random() * (app.w - this.size);
+    this.ctnr.y = this.size + Math.random() * (app.h - this.size);
   }
 
   mouseover() {
@@ -31,7 +26,7 @@ class Cell {
     this.text.cacheAsBitmap = true;
   }
 
-  render() {
+  render(app) {
     this.ctnr = new PIXI.Container();
     this.graphics = new PIXI.Graphics();
     this.graphics.beginFill(this.color, 0.9);
@@ -50,21 +45,21 @@ class Cell {
     this.text.anchor.set(0.5, 0.5);
     this.text.cacheAsBitmap = true;
     this.ctnr.addChild(this.text);
-    app.stage.addChild(this.ctnr);
+    app.pixi.stage.addChild(this.ctnr);
   }
 
-  update() {
+  update(w, h) {
     this.ctnr.x += this.xSpeed;
     this.ctnr.y += this.ySpeed;
-    if (this.ctnr.x + this.size > bounds.width) {
-      this.ctnr.x = bounds.width - this.size;
+    if (this.ctnr.x + this.size > w) {
+      this.ctnr.x = w - this.size;
       this.xSpeed *= -1;
     } else if (this.ctnr.x - this.size < 0) {
       this.ctnr.x = this.size;
       this.xSpeed *= -1;
     }
-    if (this.ctnr.y + this.size > bounds.height) {
-      this.ctnr.y = bounds.height - this.size;
+    if (this.ctnr.y + this.size > h) {
+      this.ctnr.y = h - this.size;
       this.ySpeed *= -1;
     } else if (this.ctnr.y - this.size < 0) {
       this.ctnr.y = this.size;
@@ -72,31 +67,3 @@ class Cell {
     }
   }
 }
-
-window.addEventListener("resize", function() {
-  app.renderer.resize(window.innerWidth, window.innerHeight);
-});
-
-function setupVis() {
-  app = new PIXI.Application(window.innerWidth, window.innerHeight, {
-    backgroundColor: palette.shift(),
-    transparent: false,
-    antialias: true
-  });
-  document.body.appendChild(app.view);
-  app.ticker.add(update);
-}
-
-function update() {
-  bounds = { width: window.innerWidth, height: window.innerHeight };
-  cells.forEach(c => !c.hover && c.update());
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  getData().then((data) => {
-    setupVis();
-    cookieData = data;
-    cookieData.domains.forEach((domain) =>
-      cells.push(new Cell(domain, cookieData.consolidated[domain])));
-  });
-});

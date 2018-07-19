@@ -1,3 +1,5 @@
+const palette = [0x069CF6, 0xFC5F02, 0xF1C917, 0x20E045, 0xF82D04, 0x63419D];
+
 const getData = () => new Promise((resolve, reject) => {
   const consolidated = {};
   chrome.cookies.getAll({}, (cookies) => {
