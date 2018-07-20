@@ -23,8 +23,9 @@ const getData = () => new Promise((resolve, reject) => {
 });
 
 const removeCookies = cookies => cookies.forEach((c) => {
-  chrome.cookies.remove({ url: `http://${c.domain}${c.path}`, name: c.name });
-  chrome.cookies.remove({ url: `https://${c.domain}${c.path}`, name: c.name });
+  let prefix = c.secure ? "https://" : "http://";
+  if (c.domain.charAt(0) === '.') { prefix += 'www'; }
+  chrome.cookies.remove({ url: `${prefix}${c.domain}${c.path}`, name: c.name });
 });
 
 const tween = (obj) => new TWEEN.Tween(obj);
