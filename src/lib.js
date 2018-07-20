@@ -1,4 +1,7 @@
-const palette = [0x069CF6, 0xFC5F02, 0xF1C917, 0x20E045, 0xF82D04, 0x63419D];
+const palette = [0x006099, 0xFF3C6E, 0xFF5722, 0xFFCA2C, 0x26C6DA, 0x03A9F4];
+const disabledPalette = [0x26C6DA];
+
+const disabledParticles = 0;
 
 const getData = () => new Promise((resolve, reject) => {
   const consolidated = {};
@@ -18,3 +21,10 @@ const getData = () => new Promise((resolve, reject) => {
     resolve({ domains, consolidated, total });
   });
 });
+
+const removeCookies = cookies => cookies.forEach((c) => {
+  chrome.cookies.remove({ url: `http://${c.domain}${c.path}`, name: c.name });
+  chrome.cookies.remove({ url: `https://${c.domain}${c.path}`, name: c.name });
+});
+
+const tween = (obj) => new TWEEN.Tween(obj);
